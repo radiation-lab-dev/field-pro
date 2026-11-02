@@ -28,7 +28,7 @@ export const HOME_SHARE = "Field Pro — ISO 4037 reference X-ray and gamma fiel
  *  - updated: 사이트맵 lastmod 와 JSON-LD dateModified 가 같은 값을 쓴다 — 본문을 고치면 함께 고친다. */
 const UPDATED = "2026-10-28";
 export const PAGES = {
-  home:     { currentHref: HOME, pageUrl: HOME, shareText: HOME_SHARE, updated: UPDATED },
+  home:     { currentHref: HOME, pageUrl: HOME, shareText: HOME_SHARE, updated: "2026-11-02" },
   notFound: { currentHref: "",   pageUrl: HOME, shareText: HOME_SHARE },
   guide: {
     path: "guide", crumb: "Guide", updated: UPDATED,
@@ -49,7 +49,7 @@ export const PAGES = {
     description: "Field Pro against ISO 4037: HVL1 of all 50 qualities within 4% below 40 keV and 2% above, nuclide coefficients within 1.1%, causes of deviations, limits.",
   },
   about: {
-    path: "about", crumb: "About", updated: "2026-10-29",
+    path: "about", crumb: "About", updated: "2026-11-02",
     title: "About Field Pro · Radiation Lab",
     h1: "About Field Pro",
     description: "What Field Pro is for, who writes it, how it is built, what stays on your computer, and its limits: planning and cross-checking, not an accredited calibration.",
@@ -73,7 +73,7 @@ export const PAGES = {
     description: "Five chamber readings to 1.5328 ± 0.031: air-density correction 1.0336, Type A k = 2.776, a 1% certificate component, and why the combined k is 1.96.",
   },
   changelog: {
-    path: "changelog", crumb: "Changes", parent: "about", updated: "2026-10-29",
+    path: "changelog", crumb: "Changes", parent: "about", updated: "2026-11-02",
     title: "Changes between versions · Field Pro · Radiation Lab",
     h1: "Changes between versions of Field Pro",
     description: "What changed from one version of Field Pro to the next, calculated values first: the numbering rule, version 1.0.0 and the data its results rest on.",
