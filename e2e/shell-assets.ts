@@ -6,7 +6,10 @@
  *    (`gate/shell-assets.mjs`), 이 저장소의 주소는 절대 주소라 서버가 가로챌 수 없으므로 Playwright 의 route 로 같은 일을 한다.
  *  ★ 어디서: `SHELL_DIR` 환경변수가 있으면 그 폴더(우산 저장소를 옆에 두고 일할 때 `SHELL_DIR=../radiation-lab/public/shell`),
  *    없으면 이 저장소의 사본 `shell/` — 빌드가 쓰는 shell.json · render.mjs 와 **같은 판**이다.
- *  ★ apex 의 다른 요청(/track.js 등)은 건드리지 않는다. 없는 파일은 404 — `npm run sync-shell` 을 권한다. */
+ *  ★ 없는 셸 파일은 404 — `npm run sync-shell` 을 권한다.
+ *  ★ 방문 집계 `https://radiation-lab.com/track.js`(2026-11-02, PR C)는 **빈 스크립트**로 대신 내준다 — 진짜를 받으면 시험 방문이
+ *    운영 Supabase 집계(lab pro)에 쌓인다. 태그가 붙어 있는지는 gate/check-shell ⑪ 이 HTML 바이트로 잰다.
+ *    혹시 다른 경로로 집계 RPC 가 나가도 막는다(*.supabase.co → 204). */
 import { existsSync, readFileSync } from "node:fs";
 import { extname, join } from "node:path";
 import type { Page } from "@playwright/test";
@@ -16,6 +19,9 @@ const MIME: Record<string, string> = { ".css": "text/css", ".js": "text/javascri
                                        ".woff2": "font/woff2", ".txt": "text/plain" };
 
 export async function routeShellAssets(page: Page): Promise<void> {
+  await page.route("https://radiation-lab.com/track.js", (route) =>
+    route.fulfill({ status: 200, contentType: "text/javascript", body: "/* e2e: visit counting stubbed */" }));
+  await page.route(/^https:\/\/[^/]+\.supabase\.co\//, (route) => route.fulfill({ status: 204, body: "" }));
   await page.route(/^https:\/\/radiation-lab\.com\/shell\//, (route) => {
     const p = new URL(route.request().url()).pathname.slice("/shell/".length);
     const f = join(SHELL_DIR, p);

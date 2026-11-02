@@ -14,9 +14,12 @@ export default function shellPlugin() {
     async buildStart() { shell = await loadShell(); },
     transformIndexHtml: {
       order: "pre",
-      async handler(html) {
+      async handler(html, ctx) {
         shell ??= await loadShell();
-        return fillSlots(html, fragmentsFor(shell, "home"));
+        const frag = fragmentsFor(shell, "home");
+        /* dev 서버에서는 방문 집계 태그를 뺀다 — 로컬 방문이 운영 집계(lab pro)에 섞이지 않게. 산출물(build)에는 들어간다. */
+        if (ctx?.server) frag.track = "";
+        return fillSlots(html, frag);
       },
     },
   };

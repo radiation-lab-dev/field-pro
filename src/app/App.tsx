@@ -283,8 +283,8 @@ export function App() {
       {/* 앱 머리 블록 — 사이트 머리글(header.site, 「Radiation Lab / Field Pro」 · 메뉴 · 테마)은 공통 셸이 index.html 에 들고 있어
           여기서는 제품명 h1 과 도구 막대만 둔다(2026-10-28, 공통 셸 v3). 건너뛰기 링크도 index.html 의 정적 요소다. */}
       <div className="hdr">
-        <h1>Radiation Field Pro</h1>
-        <span className="sub">{t("sub")}</span>
+        {/* 부제는 h1 안에 둔다(2026-11-02 PR C) — 검색 결과 · 크롤러가 제품명과 하는 일을 한 제목으로 읽게. index.html 정적 사본과 같아야 한다. */}
+        <h1>Radiation Field Pro <span className="sub">— {t("sub")}</span></h1>
         <span className="std">ISO 4037-1/-3/-4 · GUM</span>
         <p className="en">{t("intro")}</p>
         <div className="toolbar no-print" role="toolbar" aria-label={t("toolbarAria")}>

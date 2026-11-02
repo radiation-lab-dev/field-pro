@@ -22,7 +22,7 @@ button, input, select { font: inherit; color: inherit; touch-action: manipulatio
 /* ---- 앱 머리 블록 (사이트 머리글은 공통 셸 header.site — 이 블록은 그 아래 본문 첫 블록) ---- */
 .hdr { display: flex; align-items: baseline; gap: 14px; padding: 14px 22px 10px; border-bottom: 1px solid rgb(var(--c-line-strong)); }
 .hdr h1 { margin: 0; text-wrap: balance; font-family: var(--display); font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
-.hdr .sub { color: rgb(var(--c-ink-muted)); font-size: 12.5px; }
+.hdr .sub { color: rgb(var(--c-ink-muted)); font-family: var(--body); font-size: 12.5px; font-weight: 400; letter-spacing: 0; }
 .hdr .std { margin-left: auto; font-family: var(--mono); font-size: 11px; color: rgb(var(--c-ink-faint)); letter-spacing: 0.06em; }
 .hdr .en { flex-basis: 100%; margin: 2px 0 0; font-size: 11.5px; color: rgb(var(--c-ink-faint)); }
 
@@ -219,7 +219,7 @@ svg.spec .kerma-t { fill: rgb(var(--c-accent)); font-weight: 600; }
 .mbar .calc:disabled { background: rgb(var(--c-panel)); color: rgb(var(--c-ink-faint)); }
 .mbar .msum { background: transparent; border: 0; text-align: left; font-size: 11.5px; color: rgb(var(--c-ink-muted)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; padding: 0; cursor: pointer; }
 @media (max-width: 980px) {
-  .hdr .sub { display: none; }
+  .hdr .sub { display: block; font-size: 12px; } /* 좁은 화면: h1 안 부제를 다음 줄로(숨기지 않는다 — 모바일 색인도 같은 h1 을 읽게) */
   .toolbar .calc, .toolbar .mode, .toolbar .sep { display: none; } /* 모바일은 하단 바가 담당 */
   .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ro .v { font-size: 19px; }

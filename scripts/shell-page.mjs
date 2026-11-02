@@ -28,7 +28,7 @@ export const HOME_SHARE = "Field Pro — ISO 4037 reference X-ray and gamma fiel
  *  - updated: 사이트맵 lastmod 와 JSON-LD dateModified 가 같은 값을 쓴다 — 본문을 고치면 함께 고친다. */
 const UPDATED = "2026-10-28";
 export const PAGES = {
-  home:     { currentHref: HOME, pageUrl: HOME, shareText: HOME_SHARE, updated: UPDATED },
+  home:     { currentHref: HOME, pageUrl: HOME, shareText: HOME_SHARE, updated: "2026-11-02" },
   notFound: { currentHref: "",   pageUrl: HOME, shareText: HOME_SHARE },
   guide: {
     path: "guide", crumb: "Guide", updated: UPDATED,
@@ -49,7 +49,7 @@ export const PAGES = {
     description: "Field Pro against ISO 4037: HVL1 of all 50 qualities within 4% below 40 keV and 2% above, nuclide coefficients within 1.1%, causes of deviations, limits.",
   },
   about: {
-    path: "about", crumb: "About", updated: "2026-10-29",
+    path: "about", crumb: "About", updated: "2026-11-02",
     title: "About Field Pro · Radiation Lab",
     h1: "About Field Pro",
     description: "What Field Pro is for, who writes it, how it is built, what stays on your computer, and its limits: planning and cross-checking, not an accredited calibration.",
@@ -73,7 +73,7 @@ export const PAGES = {
     description: "Five chamber readings to 1.5328 ± 0.031: air-density correction 1.0336, Type A k = 2.776, a 1% certificate component, and why the combined k is 1.96.",
   },
   changelog: {
-    path: "changelog", crumb: "Changes", parent: "about", updated: "2026-10-29",
+    path: "changelog", crumb: "Changes", parent: "about", updated: "2026-11-02",
     title: "Changes between versions · Field Pro · Radiation Lab",
     h1: "Changes between versions of Field Pro",
     description: "What changed from one version of Field Pro to the next, calculated values first: the numbering rule, version 1.0.0 and the data its results rest on.",
@@ -142,13 +142,44 @@ export function fragmentsFor({ spec, R }, page) {
     crumbs: p.trail ? R.renderBreadcrumb(spec, { section: SECTION, trail: p.trail }) : "",
     footer: R.renderFooter(spec, { section: SECTION, pageUrl: p.pageUrl, shareText: p.shareText }),
     version: renderVersion(),
+    ld: page === "home" ? homeLd() : "",
+    track: TRACK_TAG,
   };
 }
 
-/** index.html 의 자리표시 넷. 사람이 읽는 index.html 에는 이 주석만 있고, 산출물에는 render.mjs 출력(셋)과 판 줄이 글자 그대로 들어간다. */
-export const SLOTS = { head: "<!-- rl-shell:head -->", header: "<!-- rl-shell:header -->", version: "<!-- rl-version -->", footer: "<!-- rl-shell:footer -->" };
+/** 방문 집계 (2026-11-02, PR C) — 다른 하위 사이트(calc · radimeter · disposal)처럼 우산의 track.js 한 벌을 붙인다.
+ *  ★ 이 사이트는 다른 오리진(pro.)이라 루트 상대 `/track.js` 가 아니라 apex 절대 주소다. lab 이름은 `pro`(SECTION 과 같다) —
+ *    우산 sql/visits.sql 의 rl_track 허용 목록에 `pro` 가 있어야 'unknown' 으로 묶이지 않는다(radiation-lab PR C2).
+ *  ★ 꼬리말 뒤에 둔다(gate ②: 꼬리말 뒤에는 script · link 만). dev 서버(vite)에서는 빼고(vite-plugin-shell), E2E 는 빈 스크립트로
+ *    가로챈다(e2e/shell-assets.ts) — 로컬 · 시험 방문이 운영 집계에 섞이지 않게. */
+export const TRACK_SRC = "https://radiation-lab.com/track.js";
+export const TRACK_TAG = `<script src="${TRACK_SRC}" data-lab="${SECTION}" defer></script>`;
 
-/** 자리표시를 조각으로 바꾼다. 넷이 다 있어야 한다 — 하나라도 없으면 쪽이 셸이나 판 줄 없이 나가므로 실패다. */
+/** 첫 화면의 JSON-LD (2026-11-02, PR C) — WebApplication 하나. 별점 · 리뷰는 넣지 않는다(지어내지 않는다).
+ *  설명은 index.html 의 meta description 과 같은 사실만 — 판(softwareVersion)은 src/version.json 에서 온다. */
+export const HOME_APP = {
+  name: "Radiation Field Pro",
+  alternateName: "Field Pro",
+  description: "X-ray tube spectrum calculator and ISO 4037 reference field workbench in the browser: tungsten-anode spectrum for a tube voltage and filtration, mean and effective energy, HVL1, HVL2 and homogeneity coefficient, comparison with the 50 ISO 4037-1 beam qualities, Cs-137 and Co-60 fields, Hp(10), H*(10) and H′(0.07) conversion, air-density correction and a GUM uncertainty budget.",
+};
+export function homeLd() {
+  const org = { "@type": "Organization", name: "Radiation Lab", url: "https://radiation-lab.com/" };
+  const ld = {
+    "@context": "https://schema.org", "@type": "WebApplication", "@id": `${HOME}#app`,
+    name: HOME_APP.name, alternateName: HOME_APP.alternateName, description: HOME_APP.description, url: HOME,
+    applicationCategory: "ScienceApplication", operatingSystem: "Any (web browser)", browserRequirements: "Requires JavaScript",
+    inLanguage: "en", isAccessibleForFree: true, softwareVersion: VERSION.version,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    creator: org, publisher: org,
+  };
+  return `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`;
+}
+
+/** index.html 의 자리표시(셸 셋 · 판 줄 · JSON-LD · 집계 태그). 사람이 읽는 index.html 에는 이 주석만 있고, 산출물에는 render.mjs 출력(셋)과 판 줄이 글자 그대로 들어간다. */
+export const SLOTS = { head: "<!-- rl-shell:head -->", header: "<!-- rl-shell:header -->", version: "<!-- rl-version -->", footer: "<!-- rl-shell:footer -->",
+                       ld: "<!-- rl-ld -->", track: "<!-- rl-track -->" };
+
+/** 자리표시를 조각으로 바꾼다. 다 있어야 한다 — 하나라도 없으면 쪽이 셸이나 판 줄 없이 나가므로 실패다. */
 export function fillSlots(html, frag) {
   for (const k of Object.keys(SLOTS)) {
     const n = html.split(SLOTS[k]).length - 1;

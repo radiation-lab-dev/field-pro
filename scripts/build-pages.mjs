@@ -125,7 +125,7 @@ export async function renderAll() {
   out.set("404.html", doc({
     spec, head: nf.head, title: "Page not found · Field Pro · Radiation Lab", robots: "noindex, follow",
     description: "This address has no page. The Field Pro workbench and the rest of Radiation Lab are linked here.",
-    body: `${nf.header}\n${R.renderNotFound(spec, { section: SECTION })}\n${nf.version}\n${nf.footer}`,
+    body: `${nf.header}\n${R.renderNotFound(spec, { section: SECTION })}\n${nf.version}\n${nf.footer}\n${nf.track}`,
   }));
   for (const k of ARTICLE_PAGES) {
     const p = PAGES[k];
@@ -133,7 +133,7 @@ export async function renderAll() {
     const body = readFileSync(join(ROOT, p.content), "utf8").trim();
     out.set(`${p.path}/index.html`, doc({
       spec, head: f.head, title: p.title, description: p.description, canonical: p.url, ogType: "article", ld: articleLd(p),
-      body: `${f.header}\n${f.crumbs}\n${articleMain(p, body)}\n${f.version}\n${f.footer}`,
+      body: `${f.header}\n${f.crumbs}\n${articleMain(p, body)}\n${f.version}\n${f.footer}\n${f.track}`,
     }));
   }
   out.set("sitemap.xml", sitemap());

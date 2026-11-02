@@ -24,6 +24,10 @@
          apex-hosted shell.css / shell.js (?v=version) are written here at build time by scripts/vite-plugin-shell.mjs.
          No Google Fonts: Saira comes with shell.css from the apex, the body is system-ui, numbers are ui-monospace. -->
     <!-- rl-shell:head -->
+    <!-- WebApplication JSON-LD (2026-11-02): written here at build time from homeLd() in scripts/shell-page.mjs.
+         The visit counter tag (the umbrella's script with data-lab="pro", like the other labs) is written after the footer,
+         at the rl-track placeholder, from TRACK_TAG in the same file; the dev server leaves it out. -->
+    <!-- rl-ld -->
     <style>
       /* The app mounts into #root after its script runs. Reserving one viewport keeps the static section below the fold
          until then, so nothing visible is pushed when React renders (Lighthouse CLS was 0.955 with the section at y≈0). */
@@ -34,7 +38,10 @@
   <body>
     <a class="skip" href="#main">Skip to main content</a>
     <!-- rl-shell:header -->
-    <div id="root"></div>
+    <!-- The app head (h1, subtitle, one-line summary) is also written statically inside #root (2026-11-02), so the first paint,
+         crawlers and visitors without JavaScript see the product name and what it computes. React replaces it with the same
+         text when it mounts; the wording must match src/app/i18n.ts (sub, intro) — src/app/static-head.test.ts checks it. -->
+    <div id="root"><div class="hdr"><h1>Radiation Field Pro <span class="sub">— X-ray tube spectrum calculator for ISO 4037 reference fields</span></h1><span class="std">ISO 4037-1/-3/-4 · GUM</span><p class="en">Calculate the X-ray spectrum of a tungsten-anode tube from tube voltage and filtration, read HVL1, HVL2 and the homogeneity coefficient, match the beam to the ISO 4037-1 qualities, and add Cs-137 and Co-60 fields, Hp(10) and H*(10) conversion and a GUM uncertainty budget — all computed in this browser.</p></div></div>
     <!-- A static description outside the app root (2026-10-27): crawlers and visitors without JavaScript
          read what the workbench does; with JavaScript it sits below the app and never overlaps it.
          One h1 stays the app's own, so this section starts at h2. Accuracy figures come from docs/accuracy-spec.md. -->
@@ -111,6 +118,7 @@
          scripts/vite-plugin-shell.mjs — the same line every Field Pro page carries just above the common footer. -->
     <!-- rl-version -->
     <!-- rl-shell:footer -->
+    <!-- rl-track -->
     <script type="module" src="/src/app/main.tsx"></script>
   </body>
 </html>
