@@ -35,6 +35,9 @@
  *       설명 쪽 · 변경 기록, dist · public)에 renderVersion 출력이 **하나**, 꼬리말 바로 앞(사이에 빈칸뿐)에 글자 그대로 있다.
  *       변경 기록 쪽에 판마다 `<h2 id="v1-0-0">1.0.0 — 29 October 2026</h2>` 꼴의 절 머리가 하나씩 RELEASES 순서로(첫 절 = 지금 판),
  *       About 이 /changelog/ 를 링크한다. 변경 기록도 ⑥ · ⑨ 를 설명 쪽과 같이 받는다(색인 · 400~900어 · 출처 · 사이트맵).
+ *    ⑪ 방문 집계(2026-11-02, PR C): 모든 쪽에 우산 track.js 태그(TRACK_TAG, data-lab="pro")가 하나, 꼬리말 뒤.
+ *    ⑫ 첫 화면(2026-11-02, PR C): #root 안 정적 h1(제품명 — 부제) · 소개 문단, h1 하나, head 에 homeLd() 의 WebApplication JSON-LD
+ *       (url · 무료 · 제작자 Radiation Lab · softwareVersion = 지금 판, 별점 · 리뷰 없음).
  *    ⑧ vendored 사본(shell/)이 우산 정본과 같은가 — 옆에 우산 체크아웃(`../radiation-lab/public/shell` 또는 SHELL_SOURCE)이 있을 때만
  *       대조해 **경고**로 적는다(실패 아님 — CI 에는 우산이 없고, 정본이 앞서 갔을 수 있다 → `npm run sync-shell`).
  *  ★ 못 보는 것 — 화면은 안 본다(머리글 높이 · 넘침 · 다크 전환 · 뒤로가기는 e2e/workbench.spec.ts 가 Chromium 으로 잰다).
@@ -122,6 +125,26 @@ for (const f of FILES) {
   if (ver !== 1) bad.push(`${f.tag}: 판 줄(renderVersion — Version ${VERSION.version} · ${longDate(VERSION.date)} · What changed)이 ${ver}개(하나여야 한다)`);
   else if (!/^\s*<footer class="site"/.test(s.slice(s.indexOf(line) + line.length))) bad.push(`${f.tag}: 판 줄이 꼬리말 바로 앞에 있지 않다`);
   if (!/\.fp-ver\s*\{/.test(cssOf(s))) bad.push(`${f.tag}: 판 줄의 CSS(.fp-ver)가 없다`);
+  /* ⑪ 방문 집계 (2026-11-02, PR C) — 우산 track.js 태그(data-lab="pro") 하나, 꼬리말 뒤 */
+  const tracks = s.split(want.track).length - 1;
+  if ((s.match(/track\.js/g) || []).length !== 1 || tracks !== 1) bad.push(`${f.tag}: 방문 집계 태그(${want.track})가 하나가 아니다(${tracks}개)`);
+  else if (s.indexOf(want.track) < s.indexOf("</footer>")) bad.push(`${f.tag}: 방문 집계 태그가 꼬리말 앞에 있다`);
+  /* ⑫ 첫 화면 — 정적 h1 · 소개(JS 전에도 보임)와 WebApplication JSON-LD (2026-11-02, PR C) */
+  if (f.page === "home") {
+    const rootStatic = (s.match(/<div id="root">([\s\S]*?)<\/div><\/div>/) || [])[1] || "";
+    if (!/^<div class="hdr"><h1>Radiation Field Pro <span class="sub">— [^<]+<\/span><\/h1>/.test(rootStatic)) bad.push(`${f.tag}: #root 안 정적 h1(Radiation Field Pro — 부제)이 없다`);
+    if (!/<p class="en">[^<]{80,}<\/p>/.test(rootStatic)) bad.push(`${f.tag}: #root 안 정적 소개 문단(p.en)이 없다`);
+    if ((s.match(/<h1[\s>]/g) || []).length !== 1) bad.push(`${f.tag}: h1 이 하나가 아니다`);
+    const homeHead = s.slice(0, s.indexOf("<body"));
+    if (!homeHead.includes(want.ld)) bad.push(`${f.tag}: head 에 homeLd() 출력(WebApplication JSON-LD)이 글자 그대로 없다`);
+    const apps = [...homeHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => { try { return JSON.parse(m[1]); } catch { return null; } }).filter((x) => x?.["@type"] === "WebApplication");
+    if (apps.length !== 1) bad.push(`${f.tag}: WebApplication JSON-LD 가 ${apps.length}개(하나여야 한다)`);
+    else {
+      const a = apps[0];
+      if (a.url !== HOME || a.isAccessibleForFree !== true || a.offers?.price !== "0" || a.creator?.name !== "Radiation Lab" || a.softwareVersion !== VERSION.version) bad.push(`${f.tag}: WebApplication 의 url · 무료 · 제작자 · 판이 맞지 않다`);
+      if ("aggregateRating" in a || "review" in a) bad.push(`${f.tag}: WebApplication 에 별점 · 리뷰가 있다(지어내지 않는다)`);
+    }
+  }
   /* ③ head 자산 */
   const head = s.slice(0, s.indexOf("<body"));
   if (!head.includes(want.head)) bad.push(`${f.tag}: head 에 renderHeadAssets 출력(테마 부팅 + preconnect + shell.css?v=${V} + shell.js?v=${V})이 글자 그대로 없다`);
@@ -164,7 +187,7 @@ for (const f of FILES) {
     if (!s.includes(`<a href="${HOME}">Field Pro home</a>`)) bad.push(`${f.tag}: 구역 홈 링크가 없다`);
     if (/<title>Page not found · Field Pro · Radiation Lab<\/title>/.test(head) === false) bad.push(`${f.tag}: <title> 이 「Page not found · Field Pro · Radiation Lab」 이 아니다`);
   } else {
-    if (!/<div id="root"><\/div>/.test(body)) bad.push(`${f.tag}: #root 가 없다`);
+    if (!/<div id="root"><div class="hdr">/.test(body)) bad.push(`${f.tag}: #root(안에 정적 머리 .hdr)가 없다`);
     if (!/<section class="fp-about"/.test(body)) bad.push(`${f.tag}: 정적 소개 절(.fp-about)이 없다`);
     else {
       homeAbout = body.slice(body.indexOf('<section class="fp-about"'), body.indexOf("</section>", body.indexOf('<section class="fp-about"')));

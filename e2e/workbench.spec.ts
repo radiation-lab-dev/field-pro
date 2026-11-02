@@ -318,3 +318,25 @@ test.describe("워크벤치 U1/U2/U3", () => {
     await page.screenshot({ path: "test-results/mobile-result.png", fullPage: true });
   });
 });
+
+test.describe("첫 화면 정적 머리 (2026-11-02, PR C)", () => {
+  test.use({ javaScriptEnabled: false });
+  test("JS 없이도 h1(제품명 — X-ray tube spectrum calculator …)과 소개 문단이 보인다", async ({ page }) => {
+    await page.goto("/");
+    const h1 = page.getByRole("heading", { level: 1 });
+    await expect(h1).toHaveCount(1);
+    await expect(h1).toBeVisible();
+    await expect(h1).toContainText("Radiation Field Pro");
+    await expect(h1).toContainText("X-ray tube spectrum calculator");
+    await expect(page.locator("#root .hdr p.en")).toBeVisible();
+    await expect(page.locator("#root .hdr p.en")).toContainText("ISO 4037-1");
+  });
+});
+
+test("JS 가 돌면 정적 머리가 앱 머리로 바뀌고 h1 은 여전히 하나다 (PR C)", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".toolbar")).toBeAttached();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.locator(".hdr")).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("X-ray tube spectrum calculator");
+});

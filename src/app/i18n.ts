@@ -5,8 +5,10 @@
 
 const en = {
   // 앱 머리 블록·도구 막대(사이트 머리글·꼬리말·건너뛰기 링크는 공통 셸 — index.html)
-  sub: "Reference X-ray and gamma field characterisation and dose workbench",
-  intro: "Spectrum, half-value layers, ISO 4037 beam-quality matching, operational dose conversion and uncertainty — all computed in this browser.",
+  //  ★ sub · intro 는 index.html 의 #root 안 정적 머리 블록에도 글자 그대로 있다(JS 전 첫 화면 · 크롤러용, 2026-11-02 PR C).
+  //    고치면 둘 다 고친다 — src/app/static-head.test.ts 가 어긋나면 실패한다. 과장 없이 실제 계산하는 것만 적는다.
+  sub: "X-ray tube spectrum calculator for ISO 4037 reference fields",
+  intro: "Calculate the X-ray spectrum of a tungsten-anode tube from tube voltage and filtration, read HVL1, HVL2 and the homogeneity coefficient, match the beam to the ISO 4037-1 qualities, and add Cs-137 and Co-60 fields, Hp(10) and H*(10) conversion and a GUM uncertainty budget — all computed in this browser.",
   toolbarAria: "Session",
   calc: "Calculate",
   calcDirty: "Calculate — inputs changed",
